@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: Тудушка
+  version: 0.0.1
+paths:
+  /todos:
+    get:
+      summary: Получить все тудушки
+      description: Вернет список всех тудушек
+      tags:
+        - Тудушка
+      responses:
+        200:
+          description: Массив тудушек
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/todoItem'
+    post:
+      summary: Добавляет новую тудушку
+      description: Добавляет новую тудушку
+      tags:
+        - Тудушка
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/todoItem'
+      responses:
+        200:
+          description: Новая тудушка успешно создана. Вернет созданную тудушку.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoItem'
+
+  /todos/{id}:
+    get:
+      summary: Получить тудушку по id
+      description: Возвращает тудушку по id
+      tags:
+        - Тудушка
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            required: true
+            description: id тудушки
+      responses:
+        200:
+          description: Возвращает тудушку по id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoItem'
+        404:
+          description: Тудушка не найдена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'todo not found'
+    patch:
+      summary: Апдейт тудушки по id
+      description: Апдейт тудушки по id
+      tags:
+        - Тудушка
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            required: true
+            description: id тудушки
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/todoItem'
+      responses:
+        200:
+          description: Тудушка успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoItem'
+    delete:
+      summary: Удалить тудушку по id
+      description: Удалить тудушку по id
+      tags:
+        - Тудушка
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            required: true
+            description: id тудушки
+      responses:
+        200:
+          description: Тудушка успешно удалена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+components:
+  schemas:
+    todoItem:
+      description: todo item
+      type: object
+      properties:
+        id:
+          type: number
+          description: id тудушки
+        description:
+          type: string
+          description: Описание задачи
+        createdAt:
+          type: string
+          description: Дата создания
+          example: "2020-06-30T18:25:02.495Z"
+        updatedAt:
+          type: string
+          description: Дата последнего обновления
+          example: "2020-06-30T18:25:02.495Z"
+        isDone:
+          type: boolean
+          description: Статус задачи
+          example: true
