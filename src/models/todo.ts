@@ -15,7 +15,7 @@ export class Todo extends Model<ITodo> implements ITodo {
 
 Todo.init({
 	id: {
-		type: DataTypes.NUMBER.UNSIGNED,
+		type: DataTypes.INTEGER.UNSIGNED,
 		autoIncrement: true,
 		primaryKey: true
 	},
