@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import koaBody from 'koa-body';
+import {sequelize} from './models';
 import { todoRouter } from './routes/todos';
-import { sequelize } from './models';
 import cors from '@koa/cors';
 import os from 'os';
 
@@ -17,13 +17,12 @@ app.use(cors()).use(koaBody());
 // log errors
 app.on('error', (error, ctx) => {
   console.log(error, ctx);
-})
+});
 
 // routes
 app.use(swaggerRouter.routes()).use(todoRouter.routes());
 
-// developing mode only
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync().then(() => {
   app.listen(PORT, () => {
     Object.values(os.networkInterfaces()).forEach((id) => {
       id?.forEach((networkInterface) => {

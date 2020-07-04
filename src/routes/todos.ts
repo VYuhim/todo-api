@@ -14,8 +14,8 @@ todoRouter
   })
   .post('/', async (ctx) => {
     try {
-      const todo = ctx.request.body;
-      const todoItem = await Todo.create({ description: todo.description });
+      const todo: { description: string } = ctx.request.body;
+      const todoItem = await Todo.create({ description: todo.description, userId: 1});
 
       ctx.body = todoItem.toJSON();
     } catch (err) {

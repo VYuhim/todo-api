@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/index.ts",
+    "migration": "npx sequelize db:migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,7 +18,8 @@
     "@types/node": "^14.0.14",
     "@types/validator": "^13.1.0",
     "@types/yamljs": "^0.2.31",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "sequelize-cli": "^6.1.0"
   },
   "dependencies": {
     "@koa/cors": "^3.1.0",
