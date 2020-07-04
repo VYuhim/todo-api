@@ -1,9 +1,9 @@
-import {Sequelize} from "sequelize";
-
+import { Sequelize } from 'sequelize';
 
 export const sequelize = new Sequelize({
-	dialect: "sqlite",
-	storage: './base.sqlite'
+  dialect: 'sqlite',
+  storage: './base.sqlite',
+  logging: false,
 });
 
-export * from './todo'
+export * from './todo';
