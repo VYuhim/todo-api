@@ -28,7 +28,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/todoItem'
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: 'New todo description'
       responses:
         200:
           description: Новая тудушка успешно создана. Вернет созданную тудушку.
@@ -84,7 +88,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/todoItem'
+              type: object
+              properties:
+                description:
+                  type: string
+                  required: false
+                isDone:
+                  type: boolean
+                  required: false
+
       responses:
         200:
           description: Тудушка успешно обновлена
@@ -131,11 +143,11 @@ components:
         createdAt:
           type: string
           description: Дата создания
-          example: "2020-06-30T18:25:02.495Z"
+          example: '2020-06-30T18:25:02.495Z'
         updatedAt:
           type: string
           description: Дата последнего обновления
-          example: "2020-06-30T18:25:02.495Z"
+          example: '2020-06-30T18:25:02.495Z'
         isDone:
           type: boolean
           description: Статус задачи
