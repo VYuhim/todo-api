@@ -14,6 +14,11 @@ const app = new Koa();
 // middlewares
 app.use(cors()).use(koaBody());
 
+// log errors
+app.on('error', (error, ctx) => {
+  console.log(error, ctx);
+})
+
 // routes
 app.use(swaggerRouter.routes()).use(todoRouter.routes());
 

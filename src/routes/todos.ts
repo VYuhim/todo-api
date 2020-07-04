@@ -9,7 +9,7 @@ todoRouter
       const todos = await Todo.findAll();
       ctx.body = todos.map((todo) => todo.toJSON());
     } catch (err) {
-      ctx.onerror(err);
+      ctx.throw(err);
     }
   })
   .post('/', async (ctx) => {
@@ -19,7 +19,7 @@ todoRouter
 
       ctx.body = todoItem.toJSON();
     } catch (err) {
-      ctx.onerror(err);
+      ctx.throw(err);
     }
   })
   .get('/:id', async (ctx) => {
@@ -35,7 +35,7 @@ todoRouter
         ctx.body = { error: 'todo not found' };
       }
     } catch (err) {
-      ctx.onerror(err);
+      ctx.throw(err);
     }
   })
   .patch('/:id', async (ctx) => {
@@ -52,7 +52,7 @@ todoRouter
         ctx.body = { error: 'todo not found' };
       }
     } catch (err) {
-      ctx.onerror(err);
+      ctx.throw(err);
     }
   })
   .delete('/:id', async (ctx) => {
@@ -69,6 +69,6 @@ todoRouter
         ctx.body = { error: 'todo not found' };
       }
     } catch (err) {
-      ctx.onerror(err);
+      ctx.throw(err);
     }
   });
