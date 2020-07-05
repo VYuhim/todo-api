@@ -9,7 +9,7 @@ import './models';
 import { swaggerRouter } from './routes/swagger';
 import {usersRouter} from "./routes/users";
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const app = new Koa();
 
 // middlewares

@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/index.ts",
+    "start:dev": "nodemon ./src/index.ts",
+    "start": "node ./build/index.js",
     "migration": "npx sequelize db:migrate",
+    "build": "tsc && mkdir ./build/swagger && cp ./src/swagger/swagger.yaml ./build/swagger/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

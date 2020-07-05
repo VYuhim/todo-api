@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Тудушка
-  version: 1.0.0
+  version: 1.1.0
 paths:
   /users:
     post:
@@ -187,9 +187,21 @@ components:
 
   schemas:
     id:
-      description: id сущности
       type: number
+      description: id сущности
       example: 1
+
+    link:
+      type: object
+      properties:
+        method:
+          type: string
+          description: http глагол
+          example: GET
+        link:
+          type: string
+          description: ссылка на действие
+          example: /link/to/action
 
     user:
       description: пользователь
@@ -202,7 +214,56 @@ components:
         name:
           type: string
           description: Имя пользователя
-          example: 'User'
+          example: User
+        _links:
+          type: object
+          properties:
+            getSelf:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: GET
+                    link:
+                      description: Ссылка на пользователя
+                      example: /user/1
+            updateSelf:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: PATCH
+                    link:
+                      description: Ссылка на обновление пользователя
+                      example: /user/1
+            removeSelf:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: DELETE
+                    link:
+                      description: Ссылка на удаление пользователя
+                      example: /user/1
+            getTodos:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: GET
+                    link:
+                      description: Ссылка на получение тудушек пользователя
+                      example: /user/1/todos
+            addTodo:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: POST
+                    link:
+                      description: Ссылка на добавление тудушек пользователю
+                      example: /user/1/todos
+
 
     todoItem:
       description: тудушка
@@ -222,12 +283,51 @@ components:
         createdAt:
           type: string
           description: Дата создания
-          example: '2020-06-30T18:25:02.495Z'
+          example: 2020-06-30T18:25:02.495Z
         updatedAt:
           type: string
           description: Дата последнего обновления
-          example: '2020-06-30T18:25:02.495Z'
+          example: 2020-06-30T18:25:02.495Z
         isDone:
           type: boolean
           description: Статус задачи
           example: true
+        _links:
+          type: object
+          properties:
+            getSelf:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: GET
+                    link:
+                      description: Ссылка на тудушку
+                      example: /todos/1
+            updateSelf:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: PATCH
+                    link:
+                      description: Ссылка на обновление тудушки
+                      example: /todos/1
+            removeSelf:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: DELETE
+                    link:
+                      description: Ссылка на удаление тудушки
+                      example: /todos/1
+            getOwner:
+              allOf:
+                - $ref: '#/components/schemas/link'
+                - properties:
+                    method:
+                      example: GET
+                    link:
+                      description: Ссылка на владельца тудушки
+                      example: /users/1
