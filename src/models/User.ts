@@ -92,4 +92,3 @@ User.hasMany(Todo, {
 	foreignKey: 'userId',
 	as: 'todos',
 });
-Todo.belongsTo(User);
