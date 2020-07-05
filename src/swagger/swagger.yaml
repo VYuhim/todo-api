@@ -1,17 +1,71 @@
 openapi: 3.0.3
 info:
   title: Тудушка
-  version: 0.0.1
+  version: 1.0.0
 paths:
-  /todos:
-    get:
-      summary: Получить все тудушки
-      description: Вернет список всех тудушек
+  /users:
+    post:
+      summary: Создать нового пользователя
+      description: Создает нового пользователя
       tags:
+        - Пользователь
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  required: true
+                  description: Имя пользователя
+                  example: User
+      responses:
+        201:
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+  /users/{id}:
+    patch:
+      summary: Изменить существующего пользователя
+      description: Изменяет существующего пользователя по id
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      tags:
+        - Пользователь
+      responses:
+        200:
+          description: Пользователь успешно изменен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+    delete:
+      summary: Удалить пользователя по id
+      description: Удаляет пользователя по id
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      tags:
+        - Пользователь
+      responses:
+        204:
+          description: Пользователь успешно удален
+
+
+  /users/{id}/todos:
+    get:
+      summary: Получить все тудушки пользователя
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      tags:
+        - Пользователь
         - Тудушка
       responses:
         200:
-          description: Массив тудушек
+          description: Получить все тудушки пользователя
           content:
             application/json:
               schema:
@@ -19,9 +73,11 @@ paths:
                 items:
                   $ref: '#/components/schemas/todoItem'
     post:
-      summary: Добавляет новую тудушку
-      description: Добавляет новую тудушку
+      summary: Добавить тудушку пользователю
+      parameters:
+        - $ref: '#/components/parameters/userId'
       tags:
+        - Пользователь
         - Тудушка
       requestBody:
         required: true
@@ -32,10 +88,12 @@ paths:
               properties:
                 description:
                   type: string
-                  example: 'New todo description'
+                  required: true
+                  description: Описание тудушки
+                  example: Описание новой тудушки
       responses:
-        200:
-          description: Новая тудушка успешно создана. Вернет созданную тудушку.
+        201:
+          description: Тудушка успешно создана
           content:
             application/json:
               schema:
@@ -48,12 +106,7 @@ paths:
       tags:
         - Тудушка
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-            required: true
-            description: id тудушки
+        - $ref: '#/components/parameters/todoId'
       responses:
         200:
           description: Возвращает тудушку по id
@@ -61,28 +114,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/todoItem'
-        404:
-          description: Тудушка не найдена
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: 'todo not found'
     patch:
       summary: Апдейт тудушки по id
       description: Апдейт тудушки по id
       tags:
         - Тудушка
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-            required: true
-            description: id тудушки
+        - $ref: '#/components/parameters/todoId'
       requestBody:
         required: true
         content:
@@ -93,10 +131,13 @@ paths:
                 description:
                   type: string
                   required: false
+                  description: Новое описание тудушки
+                  example: Новое описание тудушки
                 isDone:
                   type: boolean
                   required: false
-
+                  description: Новый статус тудушки
+                  example: true
       responses:
         200:
           description: Тудушка успешно обновлена
@@ -110,33 +151,60 @@ paths:
       tags:
         - Тудушка
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-            required: true
-            description: id тудушки
+        - $ref: '#/components/parameters/todoId'
       responses:
-        200:
+        204:
           description: Тудушка успешно удалена
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
 
 components:
+  parameters:
+    userId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: number
+        description: id пользователя
+
+    todoId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: number
+        description: id тудушки
+
   schemas:
-    todoItem:
-      description: todo item
+    id:
+      description: id сущности
+      type: number
+      example: 1
+
+    user:
+      description: пользователь
       type: object
       properties:
         id:
-          type: number
-          description: id тудушки
+          allOf:
+            - $ref: '#/components/schemas/id'
+            - description: id пользователя
+        name:
+          type: string
+          description: Имя пользователя
+          example: 'User'
+
+    todoItem:
+      description: тудушка
+      type: object
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/id'
+            - description: id тудушки
+        userId:
+          allOf:
+            - $ref: '#/components/schemas/id'
+            - description: id пользователя, которому принадлежит тудушка
         description:
           type: string
           description: Описание задачи
