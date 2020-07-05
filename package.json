@@ -19,7 +19,8 @@
     "@types/validator": "^13.1.0",
     "@types/yamljs": "^0.2.31",
     "nodemon": "^2.0.4",
-    "sequelize-cli": "^6.1.0"
+    "sequelize-cli": "^6.1.0",
+    "typescript": "^3.9.6"
   },
   "dependencies": {
     "@koa/cors": "^3.1.0",
@@ -31,7 +32,6 @@
     "sequelize": "^6.2.3",
     "sqlite3": "^4.2.0",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.5",
     "yamljs": "^0.3.0"
   }
 }

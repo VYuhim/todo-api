@@ -36,6 +36,17 @@ paths:
         - $ref: '#/components/parameters/userId'
       tags:
         - Пользователь
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Новое имя пользователя
+                  required: false
+
       responses:
         200:
           description: Пользователь успешно изменен

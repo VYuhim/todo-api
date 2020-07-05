@@ -27,7 +27,6 @@ export class User extends Model<IUser, TUserCreation> implements IUser {
 
 	public getTodos!: HasManyGetAssociationsMixin<Todo>;
 	public createTodo!: HasManyCreateAssociationMixin<Todo>;
-	public getTodo!: HasManyGetAssociationsMixinOptions;
 
 	public readonly todos?: Todo[];
 	public static assotiations: {

@@ -1,12 +1,13 @@
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import {sequelize} from './models';
-import { todoRouter } from './routes/todos';
+import { todosRouter } from './routes/todos';
 import cors from '@koa/cors';
 import os from 'os';
 
 import './models';
 import { swaggerRouter } from './routes/swagger';
+import {usersRouter} from "./routes/users";
 
 const PORT = 3000;
 const app = new Koa();
@@ -20,7 +21,10 @@ app.on('error', (error, ctx) => {
 });
 
 // routes
-app.use(swaggerRouter.routes()).use(todoRouter.routes());
+app
+  .use(swaggerRouter.routes())
+  .use(todosRouter.routes())
+  .use(usersRouter.routes());
 
 sequelize.sync().then(() => {
   app.listen(PORT, () => {
