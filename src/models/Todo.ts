@@ -1,7 +1,6 @@
-import { DataTypes, Model, Optional} from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from './index';
-import {IGetLink, IRemoveLink, IUpdateLink} from "../types/links";
-
+import { IGetLink, IRemoveLink, IUpdateLink } from '../types/links';
 
 interface ITodoLinks {
   getSelf: IGetLink;
@@ -56,23 +55,23 @@ Todo.init(
         return {
           getSelf: {
             method: 'GET',
-            link: `/todos/${this.id}`
+            link: `/todos/${this.id}`,
           },
           updateSelf: {
             method: 'PATCH',
-            link: `/todos/${this.id}`
+            link: `/todos/${this.id}`,
           },
           removeSelf: {
             method: 'DELETE',
-            link: `/todos/${this.id}`
+            link: `/todos/${this.id}`,
           },
           getOwner: {
             method: 'GET',
-            link: `/users/${this.owner}`
-          }
-        }
-      }
-    }
+            link: `/users/${this.owner}`,
+          },
+        };
+      },
+    },
   },
   {
     sequelize,

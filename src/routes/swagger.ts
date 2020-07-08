@@ -5,6 +5,6 @@ import koaSwagger from 'koa2-swagger-ui';
 
 const spec = YAML.load(path.join(__dirname, '..', 'swagger', 'swagger.yaml'));
 
-export const swaggerRouter = new Router()
+export const swaggerRouter = new Router();
 swaggerRouter.use(koaSwagger());
-swaggerRouter.get('/swagger', koaSwagger({ routePrefix: false, swaggerOptions: {spec}}));
+swaggerRouter.get('/swagger', koaSwagger({ routePrefix: false, swaggerOptions: { spec } }));

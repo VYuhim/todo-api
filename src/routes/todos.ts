@@ -1,7 +1,7 @@
 import Router from 'koa-router';
-import {Todo, User} from '../models';
-import {updateBodyValidator} from "../helpers/updateBodyValidator";
-import {authMiddleware} from "../middlewares/authMiddleware";
+import { Todo, User } from '../models';
+import { updateBodyValidator } from '../helpers/updateBodyValidator';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 export const todosRouter = new Router({ prefix: '/todos' });
 
@@ -9,8 +9,9 @@ todosRouter
   .get('/:id', authMiddleware, async (ctx) => {
     const { id } = ctx.params;
     const user = ctx.state.user as User;
+
     try {
-      const todo = await Todo.findByPk(id, {rejectOnEmpty: true});
+      const todo = await Todo.findByPk(id, { rejectOnEmpty: true });
 
       if (todo.owner !== user.login) {
         return ctx.throw('forbidden', 403);
@@ -24,17 +25,17 @@ todosRouter
   })
   .patch('/:id', authMiddleware, async (ctx) => {
     const { id } = ctx.params;
-    const {description, isDone} = ctx.request.body;
+    const { description, isDone } = ctx.request.body;
     const user = ctx.state.user as User;
 
     try {
-      const todoItem = await Todo.findByPk(id, {rejectOnEmpty: true});
+      const todoItem = await Todo.findByPk(id, { rejectOnEmpty: true });
 
       if (todoItem.owner !== user.login) {
         return ctx.throw('forbidden', 403);
       }
 
-      const updatedTodoItem = await todoItem.update(updateBodyValidator({description, isDone}));
+      const updatedTodoItem = await todoItem.update(updateBodyValidator({ description, isDone }));
       ctx.status = 200;
       ctx.body = updatedTodoItem.toJSON();
     } catch (err) {
@@ -46,7 +47,7 @@ todosRouter
     const user = ctx.state.user as User;
 
     try {
-      const todoItem = await Todo.findByPk(id, {rejectOnEmpty: true});
+      const todoItem = await Todo.findByPk(id, { rejectOnEmpty: true });
 
       if (todoItem.owner !== user.login) {
         return ctx.throw('forbidden', 403);
