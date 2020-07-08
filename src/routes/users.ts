@@ -1,104 +1,103 @@
 import Router from 'koa-router';
-import {createErrorResponse} from "../helpers/createErrorResponse";
+import bcrypt from 'bcrypt';
 import {User} from "../models";
 import {updateBodyValidator} from "../helpers/updateBodyValidator";
+import {authMiddleware} from "../middlewares/authMiddleware";
 
 export const usersRouter = new Router({prefix: '/users'});
 
 usersRouter
 	.post('/', async (ctx) => {
-		const {name} = ctx.request.body;
+		const {login, email, password} = ctx.request.body;
 
-		if (!name?.trim()) {
-			createErrorResponse(ctx, {statusCode: 400, message: 'field "name" is required'})
+		if (!login?.trim()) {
+			return ctx.throw('field "name" is required', 400);
+		}
+		if (!email?.trim()) {
+			return ctx.throw('field "email" is required', 400);
+		}
+		if (!password?.trim()) {
+			return ctx.throw('field "password" is required', 400);
+		}
+		if (password.trim().length < 8) {
+			return ctx.throw('field "password" must be longer then 8 chars', 400);
 		}
 
-		try {
-			const user = await User.create({ name });
+		const passwordHash = await bcrypt.hash(password.trim(), 12);
+		const user = await User.create({ login, email, password: passwordHash });
 
-			ctx.status = 201;
-			ctx.body = user.toJSON();
-		} catch (err) {
-			ctx.throw(err);
-		}
+		ctx.status = 201;
+		ctx.body = user.toJSON();
 	})
-	.patch('/:id', async (ctx) => {
-		const {id} = ctx.params;
-		const {name} = ctx.request.body;
+	.patch('/:login', authMiddleware, async (ctx) => {
+		const {login} = ctx.params;
+		const {email, password, oldPassword = ''} = ctx.request.body;
+		const user = ctx.state.user as User;
 
-		try {
-			const user = await User.findByPk(id);
-
-			if (user) {
-				const updatedUser = await user.update(updateBodyValidator({name}));
-
-				ctx.status = 200;
-				ctx.body = updatedUser.toJSON();
-			} else {
-				createErrorResponse(ctx, { statusCode: 404, message: 'user not found'});
-			}
-
-		} catch (err) {
-			ctx.throw(err);
+		if (login !== user.login) {
+			return ctx.throw('forbidden', 403);
 		}
-	})
-	.delete('/:id', async (ctx) => {
-		const {id} = ctx.params;
 
-		try {
-			const user = await User.findByPk(id);
-
-			if (user) {
-				await user.destroy();
-
-				ctx.status = 204;
-			} else {
-				createErrorResponse(ctx, {statusCode: 404, message: 'user not found'});
-			}
-
-		} catch (err) {
-			ctx.throw(err);
+		const compare = await bcrypt.compare(oldPassword, user.password);
+		if (!compare) {
+			return ctx.throw('forbidden', 403);
 		}
-	})
-	.get('/:id/todos', async (ctx) => {
-		const {id} = ctx.params;
 
-		try {
-			const user = await User.findByPk(id);
-
-			if (user) {
-				const todos = await user.getTodos();
-
-				ctx.status = 200;
-				ctx.body = JSON.stringify(todos);
-			} else {
-				createErrorResponse(ctx, {statusCode: 404, message: 'user not found'});
-			}
-		} catch (err) {
-			ctx.throw(err);
+		if (password && password.trim().length < 8) {
+			return ctx.throw('field "password" must be longer then 8 chars', 400);
 		}
+
+		let passwordHash = undefined;
+		if (password) {
+			passwordHash = await bcrypt.hash(password.trim(), 12);
+		}
+
+		const updatedUser = await user.update(updateBodyValidator({email, password: passwordHash}));
+		ctx.status = 200;
+		ctx.body = JSON.stringify({
+			login: updatedUser.login,
+			email: updatedUser.email,
+			createdAt: updatedUser.createdAt,
+			updatedAt: updatedUser.updatedAt,
+			_links: updatedUser._links
+		});
 	})
-	.post('/:id/todos', async (ctx) => {
-		const {id} = ctx.params;
+	.delete('/:login', authMiddleware, async (ctx) => {
+		const {login} = ctx.params;
+		const user = ctx.state.user as User;
+
+		if (login !== user.login) {
+			return ctx.throw('forbidden', 403);
+		}
+
+		await user.destroy();
+		ctx.status = 204;
+	})
+	.get('/:login/todos', authMiddleware, async (ctx) => {
+		const {login} = ctx.params;
+		const user = ctx.state.user as User;
+
+		if (login !== user.login) {
+			return ctx.throw('forbidden', 403);
+		}
+
+		ctx.status = 200;
+		ctx.body = JSON.stringify(user.todos);
+	})
+	.post('/:login/todos', authMiddleware, async (ctx) => {
+		const {login} = ctx.params;
+		const user = ctx.state.user as User;
 		const {description} = ctx.request.body;
 
+		if (login !== user.login) {
+			return ctx.throw('forbidden', 403);
+		}
+
 		if (!description?.trim()) {
-			createErrorResponse(ctx, {statusCode: 400, message: 'field "description" is required'});
+			return ctx.throw('field "description" is required', 400);
 		}
 
-		try {
-			const user = await User.findByPk(id);
-
-			if (user) {
-				const todo = await user.createTodo({description});
-
-				ctx.status = 201;
-				ctx.body = todo.toJSON();
-			} else {
-				createErrorResponse(ctx, {statusCode: 404, message: 'user not found'});
-			}
-
-		} catch (err) {
-			ctx.throw(err);
-		}
+		const todo = await user.createTodo({description});
+		ctx.status = 201;
+		ctx.body = todo.toJSON();
 	});

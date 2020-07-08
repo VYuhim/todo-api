@@ -1,8 +1,61 @@
 openapi: 3.0.3
 info:
   title: Тудушка
-  version: 1.1.0
+  version: 2.0.0
 paths:
+  /login:
+    get:
+      summary: Проверить авторизацию пользователя
+      description: Проверяет наличие токена
+      tags:
+        - Авторизация
+        - Пользователь
+      responses:
+        200:
+          description: Токен действителен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+    post:
+      summary: Авторизоваться
+      description: Авторизация пользователя, получить токен
+      tags:
+        - Авторизация
+        - Пользователь
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  description: Логин пользователя
+                  example: userLogin
+                password:
+                  type: string
+                  description: Пароль пользователя
+                  example: userPassword12345678910
+      responses:
+        200:
+          description: Пользователь успешно авторизовался
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+  /logout:
+    get:
+      summary: Разлогиниться
+      description: Удаляет токен у пользователя
+      tags:
+        - Авторизация
+        - Пользователь
+      responses:
+        204:
+          description: Пользователь успешно разлогинился
+
   /users:
     post:
       summary: Создать нового пользователя
@@ -15,11 +68,21 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                email:
+                  type: string
+                  required: true
+                  description: email пользователя
+                  example: userLogin@google.com
+                login:
                   type: string
                   required: true
                   description: Имя пользователя
-                  example: User
+                  example: userLogin
+                password:
+                  type: string
+                  required: true
+                  description: Пароль пользователя
+                  example: userPassword12345678910
       responses:
         201:
           description: Пользователь создан
@@ -28,12 +91,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/user'
 
-  /users/{id}:
+  /users/{login}:
     patch:
       summary: Изменить существующего пользователя
-      description: Изменяет существующего пользователя по id
+      description: Изменяет существующего пользователя по login
       parameters:
-        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/userLogin'
       tags:
         - Пользователь
       requestBody:
@@ -42,11 +105,22 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                email:
+                  type: string
+                  description: Новый email пользователя
+                  required: false
+                login:
                   type: string
                   description: Новое имя пользователя
                   required: false
-
+                password:
+                  type: string
+                  description: Новый пароль пользователя
+                  required: false
+                oldPassword:
+                  type: string
+                  description: Текущий пароль пользователя
+                  required: true
       responses:
         200:
           description: Пользователь успешно изменен
@@ -55,22 +129,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/user'
     delete:
-      summary: Удалить пользователя по id
-      description: Удаляет пользователя по id
+      summary: Удалить пользователя по login
+      description: Удаляет пользователя по login
       parameters:
-        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/userLogin'
       tags:
         - Пользователь
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  required: true
+                  example: userSuperPassword12345678910
+                  description: Текущий пароль пользователя
       responses:
         204:
           description: Пользователь успешно удален
 
 
-  /users/{id}/todos:
+  /users/{login}/todos:
     get:
       summary: Получить все тудушки пользователя
       parameters:
-        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/userLogin'
       tags:
         - Пользователь
         - Тудушка
@@ -86,7 +172,7 @@ paths:
     post:
       summary: Добавить тудушку пользователю
       parameters:
-        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/userLogin'
       tags:
         - Пользователь
         - Тудушка
@@ -169,13 +255,13 @@ paths:
 
 components:
   parameters:
-    userId:
+    userLogin:
       in: path
-      name: id
+      name: login
       required: true
       schema:
-        type: number
-        description: id пользователя
+        type: string
+        description: login пользователя
 
     todoId:
       in: path
@@ -207,14 +293,22 @@ components:
       description: пользователь
       type: object
       properties:
-        id:
-          allOf:
-            - $ref: '#/components/schemas/id'
-            - description: id пользователя
-        name:
+        login:
           type: string
-          description: Имя пользователя
-          example: User
+          description: Логин пользователя
+          example: userLogin
+        email:
+          type: string
+          description: email пользователя
+          example: userLogin@google.com
+        createdAt:
+          type: string
+          description: Дата создания
+          example: 2020-06-30T18:25:02.495Z
+        updatedAt:
+          type: string
+          description: Дата последнего обновления
+          example: 2020-06-30T18:25:02.495Z
         _links:
           type: object
           properties:
@@ -226,7 +320,7 @@ components:
                       example: GET
                     link:
                       description: Ссылка на пользователя
-                      example: /user/1
+                      example: /user/userLogin
             updateSelf:
               allOf:
                 - $ref: '#/components/schemas/link'
@@ -235,7 +329,7 @@ components:
                       example: PATCH
                     link:
                       description: Ссылка на обновление пользователя
-                      example: /user/1
+                      example: /user/userLogin
             removeSelf:
               allOf:
                 - $ref: '#/components/schemas/link'
@@ -244,7 +338,7 @@ components:
                       example: DELETE
                     link:
                       description: Ссылка на удаление пользователя
-                      example: /user/1
+                      example: /user/userLogin
             getTodos:
               allOf:
                 - $ref: '#/components/schemas/link'
@@ -253,7 +347,7 @@ components:
                       example: GET
                     link:
                       description: Ссылка на получение тудушек пользователя
-                      example: /user/1/todos
+                      example: /user/userLogin/todos
             addTodo:
               allOf:
                 - $ref: '#/components/schemas/link'
@@ -262,8 +356,7 @@ components:
                       example: POST
                     link:
                       description: Ссылка на добавление тудушек пользователю
-                      example: /user/1/todos
-
+                      example: /user/userLogin/todos
 
     todoItem:
       description: тудушка
@@ -330,4 +423,4 @@ components:
                       example: GET
                     link:
                       description: Ссылка на владельца тудушки
-                      example: /users/1
+                      example: /users/userLogin

@@ -3,14 +3,13 @@ import {
 	DataTypes,
 	Optional,
 	HasManyGetAssociationsMixin,
-	HasManyAddAssociationMixin,
 	HasManyCreateAssociationMixin,
 	Association,
-	HasManyGetAssociationsMixinOptions
 } from "sequelize";
 import {Todo} from "./Todo";
 import {sequelize} from "./index";
 import {ICreateLink, IGetLink, IRemoveLink, IUpdateLink} from "../types/links";
+import bcrypt from 'bcrypt';
 
 interface IUserLinks {
 	getSelf: IGetLink;
@@ -21,22 +20,24 @@ interface IUserLinks {
 }
 
 interface IUser {
-	id: number;
-	name: string;
+	email: string;
+	login: string;
+	password: string;
 	_links: IUserLinks;
 }
 
-type TUserCreation = Optional<IUser, 'id' | '_links'>;
+type TUserCreation = Optional<IUser, '_links'>;
 
 export class User extends Model<IUser, TUserCreation> implements IUser {
 	public readonly id!: number;
-	public name!: string;
+	public email!: string;
+	public login!: string;
+	public password!: string;
 	public readonly _links!: IUserLinks;
 
 	public readonly createdAt!: Date;
 	public readonly updatedAt!: Date;
 
-	public getTodos!: HasManyGetAssociationsMixin<Todo>;
 	public createTodo!: HasManyCreateAssociationMixin<Todo>;
 
 	public readonly todos?: Todo[];
@@ -46,12 +47,28 @@ export class User extends Model<IUser, TUserCreation> implements IUser {
 }
 
 User.init({
-	id: {
-		type: DataTypes.INTEGER,
+	login: {
+		type: new DataTypes.STRING(128),
+		unique: true,
 		primaryKey: true,
-		autoIncrement: true,
+		allowNull: false,
+		validate: {
+			notEmpty: true,
+			not: /\s/gm,
+		}
 	},
-	name: {
+	email: {
+		type: new DataTypes.STRING(128),
+		unique: true,
+		allowNull: false,
+		validate: {
+			isEmail: true,
+		},
+		set(val: string) {
+			this.setDataValue('email', val.toLowerCase());
+		},
+	},
+	password: {
 		type: new DataTypes.STRING(128),
 		allowNull: false,
 	},
@@ -61,23 +78,23 @@ User.init({
 			return {
 				getSelf: {
 					method: 'GET',
-					link: `/users/${this.id}`
+					link: `/users/${this.login}`
 				},
 				updateSelf: {
 					method: 'PATCH',
-					link: `/users/${this.id}`
+					link: `/users/${this.login}`
 				},
 				removeSelf: {
 					method: 'DELETE',
-					link: `/users/${this.id}`
+					link: `/users/${this.login}`
 				},
 				getTodos: {
 					method: 'GET',
-					link: `/users/${this.id}/todos`
+					link: `/users/${this.login}/todos`
 				},
 				addTodo: {
 					method: 'POST',
-					link: `/users/${this.id}/todos`
+					link: `/users/${this.login}/todos`
 				}
 			}
 		}
@@ -88,7 +105,7 @@ User.init({
 });
 
 User.hasMany(Todo, {
-	sourceKey: 'id',
-	foreignKey: 'userId',
+	sourceKey: 'login',
+	foreignKey: 'owner',
 	as: 'todos',
 });

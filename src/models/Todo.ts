@@ -12,7 +12,7 @@ interface ITodoLinks {
 
 interface ITodo {
   id: number;
-  userId: number;
+  owner: string;
   description: string;
   isDone?: boolean;
   _links: ITodoLinks;
@@ -22,7 +22,7 @@ type TTodoCreation = Optional<ITodo, 'id' | 'isDone' | '_links'>;
 
 export class Todo extends Model<ITodo, TTodoCreation> implements ITodo {
   public readonly id!: number;
-  public readonly userId!: number;
+  public readonly owner!: string;
   public description!: string;
   public isDone!: boolean;
   public readonly _links!: ITodoLinks;
@@ -38,8 +38,8 @@ Todo.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    userId: {
-      type: DataTypes.INTEGER,
+    owner: {
+      type: new DataTypes.STRING(128),
       allowNull: false,
     },
     description: {
@@ -68,7 +68,7 @@ Todo.init(
           },
           getOwner: {
             method: 'GET',
-            link: `/users/${this.userId}`
+            link: `/users/${this.owner}`
           }
         }
       }
