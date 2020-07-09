@@ -1,4 +1,11 @@
-import { Model, DataTypes, Optional, HasManyCreateAssociationMixin, Association } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  Optional,
+  HasManyCreateAssociationMixin,
+  Association,
+  HasManyGetAssociationsMixin,
+} from 'sequelize';
 import { Todo } from './Todo';
 import { sequelize } from './index';
 import { ICreateLink, IGetLink, IRemoveLink, IUpdateLink } from '../types/links';
@@ -31,6 +38,7 @@ export class User extends Model<IUser, TUserCreation> implements IUser {
   public readonly updatedAt!: Date;
 
   public createTodo!: HasManyCreateAssociationMixin<Todo>;
+  public getTodos!: HasManyGetAssociationsMixin<Todo>;
 
   public readonly todos?: Todo[];
   public static assotiations: {

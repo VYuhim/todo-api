@@ -87,8 +87,10 @@ usersRouter
       return ctx.throw('forbidden', 403);
     }
 
+    const todos = await user.getTodos();
+
     ctx.status = 200;
-    ctx.body = JSON.stringify(user.todos);
+    ctx.body = JSON.stringify(todos);
   })
   .post('/:login/todos', authMiddleware, async (ctx) => {
     const { login } = ctx.params;

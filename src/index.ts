@@ -27,7 +27,7 @@ app
   .use(usersRouter.routes())
   .use(todosRouter.routes());
 
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ alter: true }).then(() => {
   app.listen(PORT, () => {
     Object.values(os.networkInterfaces()).forEach((id) => {
       id?.forEach((networkInterface) => {
